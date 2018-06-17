@@ -1,6 +1,7 @@
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 import { Button, TextField } from '@material-ui/core/';
-import axios from 'axios';
+import fetchHelpers from '../utils/fetchHelper';
+import BusinessReviewModal from './BusinessReviewModal';
 
 const styles = {
   formStyle: {
@@ -17,7 +18,6 @@ const defaultState = {
   name: '',
   address: '',
 };
-
 export default class AutoCompleteExampleSimple extends Component {
   state = defaultState;
 
@@ -30,12 +30,17 @@ export default class AutoCompleteExampleSimple extends Component {
 
   handleSubmit = (e) => {
     e.preventDefault();
-    const URL = 'http://localhost:8080/businessInfo';
     const { name, address } = this.state;
-    const data = { name, address }; //JSON.stringify();
-    axios.post(URL, data, { 'Content-Type': 'text/html' }).then(res => { 
-      console.log('res.data', res.data);
-    });
+    const data = { name, address };
+    fetchHelpers.postBusiness(data)
+      .then(res => {
+        console.log('res.data', res.data);
+        return res.data;
+      })
+      .catch(err => {
+        console.error(err);
+      });
+
     this.setState(() => (defaultState));
   }
 
@@ -43,6 +48,7 @@ export default class AutoCompleteExampleSimple extends Component {
     return (
       <div>
         <h1 style={{ textAlign: 'center' }}>Please Enter info Below</h1>
+        <BusinessReviewModal />
         <form
           onSubmit={this.handleSubmit}
           style={styles.formStyle}

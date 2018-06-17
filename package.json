@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "mocha --reporter spec testSetup.js \"__tests__/*.spec.js\"",
     "dev": "next"
   },
   "keywords": [],
@@ -15,12 +15,28 @@
     "@zeit/next-typescript": "^1.0.1",
     "auth0-js": "^9.6.1",
     "axios": "^0.18.0",
+    "expect": "^23.1.0",
     "fork-ts-checker-webpack-plugin": "^0.4.2",
     "next": "^6.0.3",
     "prop-types": "^15.6.1",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
     "react-ga": "^2.5.3",
+    "semantic-ui-react": "^0.81.1",
     "typescript": "^2.9.2"
+  },
+  "devDependencies": {
+    "babel-eslint": "^8.2.3",
+    "babel-loader": "^7.1.4",
+    "chai": "^4.1.2",
+    "enzyme": "^3.3.0",
+    "eslint": "^4.19.1",
+    "eslint-loader": "^2.0.0",
+    "eslint-plugin-react": "^7.9.1",
+    "immutable": "^3.8.2",
+    "jest": "^23.1.0",
+    "jsdom": "^11.11.0",
+    "mocha": "^5.2.0",
+    "react-addons-test-utils": "^15.6.2"
   }
 }

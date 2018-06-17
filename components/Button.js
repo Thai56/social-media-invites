@@ -23,7 +23,7 @@ export default class AutoCompleteExampleSimple extends Component {
         style={this.props.style || {}} 
         onClick={this.props.onClick} 
         variant="raised" 
-        color={this.props. color || "primary"}
+        color={this.props. color || 'primary'}
       >
         {this.props.children} 
       </Button>
