@@ -10,10 +10,9 @@ export default class CustomDocument extends Document {
       <html>
         <Head>
           <title>Site Title</title>
-          <link href="/static/stylesheets/styles.css" rel="stylesheet" />
-          <link href="/static/stylesheets/prism.css" rel="stylesheet" />
-          <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossOrigin="anonymous" />
           <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.3.1/semantic.min.css"></link>
+      <link href="https://fonts.googleapis.com/css?family=Shrikhand" rel="stylesheet" />
+      <link rel='stylesheet' href='/_next/static/style.css' />
       </Head>
         <body>
           <Main />
