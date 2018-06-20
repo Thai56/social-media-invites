@@ -1,10 +1,11 @@
 import React from 'react';
 import { Segment, Header, Tab } from 'semantic-ui-react';
+import RegisterView from '../components/RegisterView';
 
 const panes = [
   {
     menuItem: 'Register',
-    render: () => <Tab.Pane>Register Page</Tab.Pane>,
+    render: () => <Tab.Pane><RegisterView /></Tab.Pane>,
   },
   { 
     menuItem: 'View',
