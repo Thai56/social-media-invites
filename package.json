@@ -7,6 +7,9 @@
     "test": "mocha --reporter spec testSetup.js \"__tests__/*.spec.js\"",
     "dev": "next"
   },
+  "eslintConfig": {
+    "extends": "xo"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
@@ -43,6 +46,7 @@
     "jest": "^23.1.0",
     "jsdom": "^11.11.0",
     "mocha": "^5.2.0",
+    "next-eslint": "0.0.4",
     "react-addons-test-utils": "^15.6.2"
   }
 }

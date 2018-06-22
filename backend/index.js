@@ -26,7 +26,7 @@ let server;
 // Use connect method to connect to the server
 MongoClient.connect(url, function(err, client) {
   assert.equal(null, err);
-  console.log("Connected successfully to server");
+  console.log('Connected successfully to server');
 
   db = client.db(dbName);
 
@@ -38,7 +38,9 @@ MongoClient.connect(url, function(err, client) {
 });
 
 function loadUser(req, res, next) {
-  console.log('loaduser', req.body);
+  // console.log('loaduser', req.body);
+  // const { email } = req.body;
+  console.log('req.body ', req.body);
   const { email } = req.body;
   console.log('email ', email);
     db.collection('users').find( { email: email } ).toArray(function(err, user) {
@@ -62,6 +64,26 @@ function userExists(req, res, next) {
       return;
     }
     next();
+  });
+}
+
+function saveBusiness(req, res, next) {
+  console.log('body ', req.body);
+  db.collection('businesses').save(req.body, (err, result) => {
+    if (err) next(new Error(err));
+    console.log('saved to database ');
+    // TODO: finish connecting data to the view
+    req.userId = req.body.userId;
+    next();
+  });
+}
+
+function getUserBusinesses(req, res) {
+  const { userId } = req.body;
+  db.collection('businesses').find({ user_id: userId }).toArray((err, result) => {
+    assert.equal(err, null);
+    if (err) res.status(404).send(err);
+    res.status(200).send(result);
   });
 }
 
@@ -107,22 +129,15 @@ app.delete('/users', (req, res) => {
   });
 })
 
+app.post('/dashboard/create/business', saveBusiness, getUserBusinesses);
+
+app.post('/dashboard/businesses', getUserBusinesses);
+
 // Endpoints - - - - - - - - -
 app.get('/users', (req, res) => {
   db.collection('users').find().toArray((err, result) => {
     assert.equal(err, null);
     res.status(200).send(result);
-  });
-});
-
-app.post('/businessInfo', (req, res) => {
-  console.log('request ', req.body);
-  db.collection('businesses').save(req.body, (err, result) => {
-    if (err) res.status(404).send(err); 
-
-    console.log('saved to database ');
-    // TODO: finish connecting data to the view
-    res.state(201).redirect('/');
   });
 });
 

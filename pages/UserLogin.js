@@ -1,5 +1,5 @@
 import React from 'react';
-import { 
+import {
   Grid,
   Form,
   Segment,
@@ -9,12 +9,22 @@ import {
 } from 'semantic-ui-react';
 import Router from 'next/router'
 
+import fetchHelpers from '../utils/fetchHelper';
+
 const handleRoute = () => {
-  Router.push({
-    pathname: '/Dashboard',
-    query: { user: 'ned' },
-  });
-} 
+  fetchHelpers.login()
+    .then(({ data }) => {
+      console.log('data ', data);
+      localStorage.setItem('currentUser', JSON.stringify(data.user));
+      Router.push({
+        pathname: '/Dashboard',
+        query: { user: data.user.email },
+      });
+    })
+    .catch(err => {
+      throw new Error(err);
+    });
+}
 
 const RegisterLoginPage = ({ url }) => {
   const { query: { action } } = url;
@@ -36,12 +46,12 @@ const RegisterLoginPage = ({ url }) => {
               width: 200,
               borderRadius: 90,
               marginTop: 16,
-          }} 
+          }}
         />
 
       </div>
 
-      
+
       <Header textAlign='center'>{action.toUpperCase()}</Header>
       <Divider />
 
@@ -60,13 +70,13 @@ const RegisterLoginPage = ({ url }) => {
               <Button
                 primary
                 fluid
-                onClick={() => handleRoute()}
+                onClick={handleRoute}
               >
                 {action.slice(0, 1).toUpperCase().concat(action.slice(1))}
               </Button>
               <Divider horizontal>Or</Divider>
               <Button secondary fluid>
-                {action === 'register' ? 'Login' : 'Register'} 
+                {action === 'register' ? 'Login' : 'Register'}
               </Button>
             </Segment>
           </Form>

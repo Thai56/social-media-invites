@@ -1,5 +1,5 @@
 import React from 'react';
-import { Segment, Header, Tab } from 'semantic-ui-react';
+import { Segment, Header, Tab, Spinner } from 'semantic-ui-react';
 import RegisterView from '../components/RegisterView';
 
 const panes = [
@@ -7,11 +7,11 @@ const panes = [
     menuItem: 'Register',
     render: () => <Tab.Pane><RegisterView /></Tab.Pane>,
   },
-  { 
+  {
     menuItem: 'View',
     render: () => <Tab.Pane>View Page</Tab.Pane>,
   },
-  { 
+  {
     menuItem: 'Account',
     render: () => <Tab.Pane>Account Page</Tab.Pane>,
   },
@@ -36,12 +36,12 @@ export default class Dashboard extends React.Component {
             </div>
 
             <div>
-              <span>welcome {this.props.url.query.user}!</span>
+              <span>welcome !</span>
               <span>image here</span>
             </div>
           </div>
         </Segment>
-        
+
         <Tab panes={panes}/>
 
       </div>

@@ -1,18 +1,36 @@
 import axios from 'axios';
+import constants from './constants';
 
-const URL = 'http://localhost:8080/businessInfo';
-const HEADERS = { 'Content-Type': 'text/html' };
+const { URL, HEADERS } = constants;
+
 
 const postBusiness = (data) => {
-  return axios.post(`${URL}/businessInfo`, data, HEADERS)
+  return axios.post(`${URL}/dashboard/create/business`, data, HEADERS)
 }
 
-const getAllBusinesses = () => {
-  return axios.get(URL, HEADERS);
-}
+const login = () => {
+  const body = {
+    'email': 'ned@gmail.com',
+    'password': 'ned'
+  };
+  return axios.post(`${URL}/user/login`, body, HEADERS);
+};
+
+const getUserBusinesses = ({ userId, token }) => {
+  return axios.post(`${URL}/dashboard/businesses`, {
+    userId,
+    token,
+  }, HEADERS);
+};
+
+// const getAllBusinesses = () => {
+//   return axios.get(`${URL}/businessInfo`, HEADERS);
+// }
 
 const fetchHelpers = {
   postBusiness,
-  getAllBusinesses,
+  getUserBusinesses,
+  // getAllBusinesses,
+  login,
 }
 export default fetchHelpers;

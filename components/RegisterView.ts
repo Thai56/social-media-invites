@@ -1,13 +1,22 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Input, Button } from 'semantic-ui-react';
+import { Input, Button, Loader } from 'semantic-ui-react';
 import Immutable, { fromJS } from 'immutable';
+import Router from 'next/router'
 
 import { compose, withProps, lifecycle } from 'recompose';
 import { withScriptjs } from 'react-google-maps';
 import { StandaloneSearchBox } from 'react-google-maps/lib/components/places/StandaloneSearchBox';
-import fetchHelper from '../utils/fetchHelper';
 
+import constants from '../utils/constants';
+import fetchHelpers from '../utils/fetchHelper';
+import registerUtils from '../utils/registerUtils';
+
+const { mapIdAsKey } = registerUtils;
+
+const { postBusiness, getUserBusinesses } = fetchHelpers;
+
+const { CURRENT_USER } = constants;
 
 const RegisterContainer = styled.div`
   height: 400px;
@@ -21,25 +30,62 @@ const SearchControlWrapper = styled.div`
   margin-top: 11vh;
 `;
 
-const SearchInput = styled(Input)`
-  margin-right: 4px;
-`;
-
 export default class RegisterView extends React.Component<{}, {
   businesses: Immutable.Map,
 }> {
-  state={ businesses: fromJS({}) }
+  state={
+    businesses: fromJS([{}]),
+    currentUser: '',
+    isLoading: false,
+  }
+
+  componentDidMount() {
+    if (!localStorage || !localStorage.getItem(CURRENT_USER)) {
+      Router.push({ pathname: 'Login' });
+    }
+
+    if (localStorage && localStorage.getItem(CURRENT_USER)) {
+      this.setState(() => ({ isLoading: true }));
+      const currentUser = fromJS(JSON.parse(localStorage.getItem(CURRENT_USER)));
+      getUserBusinesses({ userId: currentUser.get('_id') })
+        .then(({ data }) => {
+          console.log('data ', data);
+          this.setState(() => ({
+            currentUser,
+            businesses: mapIdAsKey(fromJS(['place_id']), fromJS(data)),
+            isLoading: false,
+          }));
+        });
+    }
+  }
 
   savePlace = (place) => {
-    console.log('SAVING ', place);
     const { businesses } = this.state;
+    console.groupCollapsed('businesses ', businesses);
+    console.groupEnd();
 
     this.setState(() => ({
-      businesses: businesses.set(fromJS(place).get('place_id'), fromJS(place)),
-    }), fetchHelper.postBusiness({}));
+      businesses: mapIdAsKey(
+        fromJS(['place_id']),
+        businesses.set(fromJS(place).get('place_id'), fromJS(place)),
+      ),
+    }));
+
+    if (!this.state.businesses.get(place.place_id)) {
+      console.log('no have this id ', place.place_id);
+      postBusiness(fromJS(place).set('user_id', this.state.currentUser.get('_id')))
+        .then(({ data }) => {
+          console.log('data ', fromJS(data));
+          this.setState(() => ({
+            businesses: mapIdAsKey(fromJS(['place_id']), fromJS(data)),
+          }));
+        })
+        .catch(() => console.error(err));
+    }
   }
 
   render() {
+    if (this.state.isLoading) return <Loader />;
     return (
       <RegisterContainer>
         <SearchControlWrapper>
@@ -101,20 +147,28 @@ const PlacesWithStandaloneSearchBox = compose(
       />
     </StandaloneSearchBox>
     <ol>
-  {props.places.map((place) => {
+  {props.places.map((place, i) => {
     const { name, place_id, formatted_address, geometry: { location } } = place;
-    console.log(place);
+    console.log(props.businesses.has(place_id));
+    console.log('props ', props.businesses);
     return (
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 16 }}>
+      <div
+        key={i}
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          marginBottom: 16,
+        }}
+      >
         <li key={place_id}>
           <b>{name}</b>
           <br />
           <span>{formatted_address}</span>
         </li>
-        <Button 
+        <Button
           positive
-          disabled={props.businesses.get(place_id)}
           onClick={() => props.savePlace(place)}
+          disabled={!!props.businesses.get(place_id)}
          >
           Save
         </Button>

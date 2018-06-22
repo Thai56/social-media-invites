@@ -1,3 +1,4 @@
+import React from 'react';
 import { Segment, Button } from 'semantic-ui-react';
 import Router from 'next/router';
 
@@ -6,10 +7,10 @@ export interface routeHandlerProps {
 }
 
 const routeHandler = (action: routeHandlerProps) => {
-  Router.push({ 
+  Router.push({
     pathname: '/UserLogin',
     query: { action: action },
-  }) 
+  })
 };
 
 export interface HeaderProps {
@@ -18,9 +19,9 @@ export interface HeaderProps {
 
 const Header = ({ text }: HeaderProps) => {
   return (
-    <Segment style={{ display: 'flex', justifyContent: 'space-between'}}> 
+    <Segment style={{ display: 'flex', justifyContent: 'space-between'}}>
       <h1 id="header-icon">{text}</h1>
-      <div>        
+      <div>
       <Button onClick={() => routeHandler('register')}>
         Register
       </Button>
