@@ -6,7 +6,7 @@ export interface routeHandlerProps {
   action: string,
 }
 
-const routeHandler = (action: routeHandlerProps) => {
+const routeHandler = (action: routeHandlerProps): void => {
   Router.push({
     pathname: '/UserLogin',
     query: { action: action },

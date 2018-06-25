@@ -8,8 +8,20 @@ import {
   Button,
 } from 'semantic-ui-react';
 import Router from 'next/router'
+import styled from 'styled-components';
 
 import fetchHelpers from '../utils/fetchHelper';
+import userImg from '../img/default-user.png';
+
+
+const UserImage = styled.div`
+  background-image: url(${userImg}); 
+  background-size: cover;
+  height: 200px;
+  width: 200px;
+  border-radius: 90px;
+  margin-top: 16px; 
+`;
 
 const handleRoute = () => {
   fetchHelpers.login()
@@ -39,16 +51,7 @@ const RegisterLoginPage = ({ url }) => {
           backgroundColor: 'blue',
         }}
       >
-        <div
-          style={{
-            backgroundColor: 'white',
-              height: 200,
-              width: 200,
-              borderRadius: 90,
-              marginTop: 16,
-          }}
-        />
-
+        <UserImage />
       </div>
 
 

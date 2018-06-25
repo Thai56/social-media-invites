@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { PureComponent } from 'react';
 import styled from 'styled-components';
 import { Input, Button, Loader } from 'semantic-ui-react';
 import Immutable, { fromJS } from 'immutable';
@@ -12,6 +12,8 @@ import constants from '../utils/constants';
 import fetchHelpers from '../utils/fetchHelper';
 import registerUtils from '../utils/registerUtils';
 
+import '../styles/main.css';
+
 const { mapIdAsKey } = registerUtils;
 
 const { postBusiness, getUserBusinesses } = fetchHelpers;
@@ -19,18 +21,19 @@ const { postBusiness, getUserBusinesses } = fetchHelpers;
 const { CURRENT_USER } = constants;
 
 const RegisterContainer = styled.div`
-  height: 400px;
+  height: 30vh;
   width: 100%;
+  position: relative;
 `;
 
-const SearchControlWrapper = styled.div`
-  width: 30%;
-  display: flex;
-  margin: auto;
-  margin-top: 11vh;
+export const OrderedList = styled.ol`
+  position: absolute;
+  width: 100%;
+  top: 100%;
+  padding-top: 20;
 `;
 
-export default class RegisterView extends React.Component<{}, {
+export default class RegisterView extends React.PureComponent<{}, {
   businesses: Immutable.Map,
 }> {
   state={
@@ -49,10 +52,12 @@ export default class RegisterView extends React.Component<{}, {
       const currentUser = fromJS(JSON.parse(localStorage.getItem(CURRENT_USER)));
       getUserBusinesses({ userId: currentUser.get('_id') })
         .then(({ data }) => {
+          console.groupCollapsed('componentDidMount ');
           console.log('data ', data);
+          console.groupEnd();
           this.setState(() => ({
             currentUser,
-            businesses: mapIdAsKey(fromJS(['place_id']), fromJS(data)),
+            businesses: mapIdAsKey(['place_id'], fromJS(data)),
             isLoading: false,
           }));
         });
@@ -64,33 +69,30 @@ export default class RegisterView extends React.Component<{}, {
     console.groupCollapsed('businesses ', businesses);
     console.groupEnd();
 
-    this.setState(() => ({
-      businesses: mapIdAsKey(
-        fromJS(['place_id']),
-        businesses.set(fromJS(place).get('place_id'), fromJS(place)),
-      ),
-    }));
-
-    if (!this.state.businesses.get(place.place_id)) {
-      console.log('no have this id ', place.place_id);
-      postBusiness(fromJS(place).set('user_id', this.state.currentUser.get('_id')))
+    if (!this.state.businesses.has(place.place_id)) {
+      postBusiness(
+        fromJS(place)
+        .set('userId', this.state.currentUser.get('_id'))
+        .set('reviewUrl', `https://search.google.com/local/writereview?placeid=${place.place_id}`)
+      )
         .then(({ data }) => {
-          console.log('data ', fromJS(data));
+          console.groupCollapsed('setting State after post ')
+          console.log('data ', data);
+          console.log('_mapIdAsKey ', mapIdAsKey(['place_id'], fromJS(data)));
+          console.groupEnd();
           this.setState(() => ({
-            businesses: mapIdAsKey(fromJS(['place_id']), fromJS(data)),
+            businesses: mapIdAsKey(['place_id'], fromJS(data)),
           }));
         })
-        .catch(() => console.error(err));
+        .catch((err) => console.error(err));
     }
   }
 
   render() {
     if (this.state.isLoading) return <Loader />;
     return (
-      <RegisterContainer>
-        <SearchControlWrapper>
+      <RegisterContainer className="hero-image">
           <PlacesWithStandaloneSearchBox businesses={this.state.businesses} savePlace={this.savePlace}/>
-        </SearchControlWrapper>
       </RegisterContainer>
     );
   }
@@ -131,11 +133,14 @@ const PlacesWithStandaloneSearchBox = compose(
     >
       <input
         type="text"
-        placeholder="Customized your placeholder"
+        placeholder="Enter your business name or address"
         style={{
           boxSizing: `border-box`,
+          position: `absolute`,
+          top: `15%`,
+          left: `33%`,
           border: `1px solid transparent`,
-          width: `240px`,
+          width: `264px`,
           height: `32px`,
           padding: `0 12px`,
           borderRadius: `3px`,
@@ -146,37 +151,29 @@ const PlacesWithStandaloneSearchBox = compose(
         }}
       />
     </StandaloneSearchBox>
-    <ol>
-  {props.places.map((place, i) => {
-    const { name, place_id, formatted_address, geometry: { location } } = place;
-    console.log(props.businesses.has(place_id));
-    console.log('props ', props.businesses);
-    return (
-      <div
-        key={i}
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          marginBottom: 16,
-        }}
-      >
-        <li key={place_id}>
-          <b>{name}</b>
-          <br />
-          <span>{formatted_address}</span>
-        </li>
-        <Button
-          positive
-          onClick={() => props.savePlace(place)}
-          disabled={!!props.businesses.get(place_id)}
-         >
-          Save
-        </Button>
-      </div>
-    );
-  })
-  }
-    </ol>
+    <OrderedList>
+      {props.places.map((place, i) => {
+        const { name, place_id, formatted_address, geometry: { location } } = place;
+        return (
+          <div key={i} style={{ padding: 24 }}>
+            <li key={place_id} style={{ float: 'left' }}>
+              <b>{name}</b>
+              <br />
+              <span>{formatted_address}</span>
+            </li>
+            <Button
+              positive
+              style={{ float: 'right', marginLeft: 16 }}
+              onClick={() => props.savePlace(place)}
+              disabled={!!props.businesses.has(place_id)}
+             >
+              Save
+            </Button>
+          </div>
+          );
+        })
+      }
+    </OrderedList>
   </div>
 );
 

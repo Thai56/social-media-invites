@@ -2,7 +2,6 @@ import React from 'react';
 import Link from 'next/link';
 import Auth from './Auth';
 import Header from '../components/Header';
-import styled from 'styled-components';
 import {
   Segment,
   Grid,

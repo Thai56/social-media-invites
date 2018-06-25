@@ -69,6 +69,7 @@ function userExists(req, res, next) {
 
 function saveBusiness(req, res, next) {
   console.log('body ', req.body);
+  req.body.timestamp = (new Date() / 1000);
   db.collection('businesses').save(req.body, (err, result) => {
     if (err) next(new Error(err));
     console.log('saved to database ');
@@ -80,8 +81,10 @@ function saveBusiness(req, res, next) {
 
 function getUserBusinesses(req, res) {
   const { userId } = req.body;
-  db.collection('businesses').find({ user_id: userId }).toArray((err, result) => {
+  console.log('_USER_ID ', userId);
+  db.collection('businesses').find({ userId: userId }).toArray((err, result) => {
     assert.equal(err, null);
+    console.log(result.length, userId);
     if (err) res.status(404).send(err);
     res.status(200).send(result);
   });
@@ -128,6 +131,16 @@ app.delete('/users', (req, res) => {
     res.status(204).send(result);
   });
 })
+
+app.delete('/businesses', (req, res) => {
+  db.collection('businesses').remove( { }, function(err, result) {
+    if(err) res.status(404).send(err);
+    console.log(result);
+    res.status(204).send(result);
+  });
+})
+
+
 
 app.post('/dashboard/create/business', saveBusiness, getUserBusinesses);
 
