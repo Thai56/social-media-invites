@@ -16,7 +16,7 @@ const { mapIdAsKey } = registerUtils;
 export default class Dashboard extends React.Component {
   state={ 
     currentUser: fromJS({}), 
-    businesses: fromJS({}), 
+    businesses: fromJS([{}]), 
   }
   
     
@@ -41,33 +41,77 @@ export default class Dashboard extends React.Component {
         });
     }
   }
+  componentDidMount() {
+    if (!localStorage || !localStorage.getItem(CURRENT_USER)) {
+      Router.push({ pathname: 'Login' });
+    }
 
-  getPanes = () => {
-    return [
+    if (localStorage && localStorage.getItem(CURRENT_USER)) {
+      this.setState(() => ({ isLoading: true }));
+      const currentUser = fromJS(JSON.parse(localStorage.getItem(CURRENT_USER)));
+      getUserBusinesses({ userId: currentUser.get('_id') })
+        .then(({ data }) => {
+          console.groupCollapsed('componentDidMount ');
+          console.log('data ', data);
+          console.groupEnd();
+          this.setState(() => ({
+            currentUser,
+            businesses: mapIdAsKey(['place_id'], fromJS(data)),
+            isLoading: false,
+          }));
+        });
+    }
+  }
+
+  getPanes = () =>
+    [
       {
         menuItem: 'Register',
-        render: () => <Tab.Pane><RegisterView /></Tab.Pane>,
+        render: () => 
+        <Tab.Pane>
+        <RegisterView 
+        savePlace={this.savePlace} 
+        businesses={this.state.businesses}
+        user={this.state.currentUser}
+        />
+        </Tab.Pane>,
       },
       {
         menuItem: 'View',
-        render: () => {
-          return (
-            <Tab.Pane>
-              <BusinessesView 
-                user={this.state.currentUser} 
-                businesses={this.state.businesses} 
-              />
-            </Tab.Pane> 
-          );
-        }
+        render: () => 
+        <Tab.Pane>
+        <BusinessesView 
+        user={this.state.currentUser} 
+        businesses={this.state.businesses} 
+        />
+        </Tab.Pane> 
       },
       {
         menuItem: 'Account',
         render: () => <Tab.Pane>Account Page</Tab.Pane>,
       },
-    ]
-  }
+    ];
+ 
   
+
+  savePlace = (place: object) => {
+    const { businesses } = this.state;
+
+    if (!this.state.businesses.has(place.place_id)) {
+      postBusiness(
+        fromJS(place)
+        .set('userId', this.state.currentUser.get('_id'))
+        .set('reviewUrl', `https://search.google.com/local/writereview?placeid=${place.place_id}`)
+      )
+        .then(({ data }) => {
+          this.setState(() => ({
+            businesses: mapIdAsKey(['place_id'], fromJS(data)),
+          }));
+        })
+        .catch((err) => console.error(err));
+    }
+  }
+
   render() {
     return(
       <div style={{ height: '100vh' }}>

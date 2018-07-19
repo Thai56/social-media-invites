@@ -24,6 +24,7 @@
     "fork-ts-checker-webpack-plugin": "^0.4.2",
     "next": "^6.0.3",
     "next-images": "^0.10.2",
+    "nodemailer": "^4.6.7",
     "prop-types": "^15.6.1",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",

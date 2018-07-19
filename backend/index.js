@@ -13,6 +13,9 @@ const {
   findDocuments,
 } = controllers.dbControllers;
 
+const reviewHandler = require('./services/reviews.service');
+const reviewInstance = reviewHandler();
+
 // Connection URL
 const url = 'mongodb://localhost:27017';
 
@@ -30,6 +33,8 @@ MongoClient.connect(url, function(err, client) {
 
   db = client.db(dbName);
 
+
+  reviewInstance(db.collection('businesses'));
   // Spinning up server - - - - -
   server = app.listen(8080, function() {
     const port = server.address().port;

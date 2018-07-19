@@ -2,7 +2,7 @@ import React, { PureComponent } from 'react';
 import styled from 'styled-components';
 import { Input, Button, Loader } from 'semantic-ui-react';
 import Immutable, { fromJS } from 'immutable';
-import Router from 'next/router'
+// import Router from 'next/router'
 
 import { compose, withProps, lifecycle } from 'recompose';
 import { withScriptjs } from 'react-google-maps';
@@ -36,63 +36,21 @@ export const OrderedList = styled.ol`
 export default class RegisterView extends React.PureComponent<{}, {
   businesses: Immutable.Map,
 }> {
-  state={
-    businesses: fromJS([{}]),
-    currentUser: '',
-    isLoading: false,
-  }
-
-  componentDidMount() {
-    if (!localStorage || !localStorage.getItem(CURRENT_USER)) {
-      Router.push({ pathname: 'Login' });
-    }
-
-    if (localStorage && localStorage.getItem(CURRENT_USER)) {
-      this.setState(() => ({ isLoading: true }));
-      const currentUser = fromJS(JSON.parse(localStorage.getItem(CURRENT_USER)));
-      getUserBusinesses({ userId: currentUser.get('_id') })
-        .then(({ data }) => {
-          console.groupCollapsed('componentDidMount ');
-          console.log('data ', data);
-          console.groupEnd();
-          this.setState(() => ({
-            currentUser,
-            businesses: mapIdAsKey(['place_id'], fromJS(data)),
-            isLoading: false,
-          }));
-        });
-    }
-  }
-
-  savePlace = (place) => {
-    const { businesses } = this.state;
-    console.groupCollapsed('businesses ', businesses);
-    console.groupEnd();
-
-    if (!this.state.businesses.has(place.place_id)) {
-      postBusiness(
-        fromJS(place)
-        .set('userId', this.state.currentUser.get('_id'))
-        .set('reviewUrl', `https://search.google.com/local/writereview?placeid=${place.place_id}`)
-      )
-        .then(({ data }) => {
-          console.groupCollapsed('setting State after post ')
-          console.log('data ', data);
-          console.log('_mapIdAsKey ', mapIdAsKey(['place_id'], fromJS(data)));
-          console.groupEnd();
-          this.setState(() => ({
-            businesses: mapIdAsKey(['place_id'], fromJS(data)),
-          }));
-        })
-        .catch((err) => console.error(err));
-    }
-  }
+  state={ isLoading: false } 
 
   render() {
-    if (this.state.isLoading) return <Loader />;
+    if (!this.props.businesses.size) return (
+      <div>
+        <b>Please save something by looking up a place and saving it in Register Tab</b>
+        <Loader />
+      </div>
+    );
     return (
       <RegisterContainer className="hero-image">
-          <PlacesWithStandaloneSearchBox businesses={this.state.businesses} savePlace={this.savePlace}/>
+      <PlacesWithStandaloneSearchBox 
+        businesses={this.props.businesses} 
+        savePlace={this.props.savePlace}
+      />
       </RegisterContainer>
     );
   }

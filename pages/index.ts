@@ -33,7 +33,7 @@ const Index = () => (
         <Grid.Row columns={3}>
           <Grid.Column>
             <Card className="full-width">
-              <Image src="data:image/png;base64,aHR0cHM6Ly9lbmNyeXB0ZWQtdGJuMC5nc3RhdGljLmNvbS9pbWFnZXM/cT10Ym46QU5kOUdjU2x2bTA1OG42UVhEV2RFdDRsc0x0V3hvb0tNeFRuQVU5TDlsLVJUVWt6SHlGWkluQkU=" />
+              <Image src={require('../img/lookingup.png')} />
               <Card.Content>
                 <Card.Header>HeaderPlaceholder</Card.Header>
                 <Card.Description>Daniel is a comedian living in Nashville.</Card.Description>

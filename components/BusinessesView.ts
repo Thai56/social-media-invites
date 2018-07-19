@@ -12,13 +12,10 @@ export default class BusinessesView extends React.Component<BusinessesProps> {
     copied: fromJS({}),
   }
   copyToClipBoard = (url: string, placeId: string) => {
-    console.log(url, navigator);
     navigator.clipboard.writeText(url)
       .then(() => {
-        console.log('SUCESSFULLY COPIED');
         this.setState(({ copied }) => ({ copied: copied.set(placeId, placeId) }));
         setTimeout(() => {
-            console.log('setting state ', this.setState);
             this.setState(({ copied }) => ({ copied: copied.delete(placeId) }))
           }, 3000)
       })
@@ -26,12 +23,11 @@ export default class BusinessesView extends React.Component<BusinessesProps> {
   }
   
   render() {
-    console.log('Props ', this.props.user);
     const { businesses } = this.props;
     return (
-      <OrderedList> 
+      <ol> 
         {
-          businesses.map((b, i) => {
+          businesses.valueSeq().map((b, i) => {
             return (
               <div key={i} style={{ padding: 60 }}>
                 <b>{b.get('name')}</b>
@@ -47,7 +43,7 @@ export default class BusinessesView extends React.Component<BusinessesProps> {
             ); 
           })
         }
-      </OrderedList> 
+      </ol> 
     );
   }
 }
